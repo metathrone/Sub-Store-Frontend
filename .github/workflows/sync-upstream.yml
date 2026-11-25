@@ -30,5 +30,11 @@ jobs:
         run: |
           git remote add upstream https://github.com/sub-store-org/Sub-Store-Front-End.git
           git fetch upstream master
-          git merge --no-edit -X theirs upstream/master
+          if [ "$(git rev-list HEAD..upstream/master --count)" -eq 0 ]; then
+            echo "Already up to date."
+            exit 0
+          fi
+          git merge --no-commit --no-ff -X theirs upstream/master
+          git checkout HEAD -- .github/workflows/main.yml
+          git commit -m "chore(sync): merge upstream/master (keep custom main.yml)"
           git push origin master
